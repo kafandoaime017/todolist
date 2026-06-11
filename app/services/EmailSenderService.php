@@ -4,8 +4,8 @@ namespace App\Services;
 
 class EmailSenderService
 {
-    public function send(string $to, string $subject): void
+    public function send(string $email, string $message): void
     {
-        //
+        
     }
 }

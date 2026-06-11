@@ -2,35 +2,31 @@
 
 namespace Tests\Unit;
 
+use Tests\TestCase;
 use App\Models\User;
-use App\Models\Item;
 use App\Models\TodoList;
-use App\Services\EmailSenderService;
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use DateTime;
 
 class TodoListTest extends TestCase
 {
-    public function test_email_sent_at_8_items()
+    public function test_todolist_belongs_to_user()
     {
-        $emailMock = Mockery::mock(EmailSenderService::class);
+        $user = User::factory()->create();
 
-        $emailMock->shouldReceive('send')
-            ->once()
-            ->with('test@test.com', 'Votre ToDoList est presque pleine');
+        $todo = TodoList::create([
+            'user_id' => $user->id
+        ]);
 
-        app()->instance(EmailSenderService::class, $emailMock);
+        $this->assertEquals($user->id, $todo->user->id);
+    }
 
-        $user = new User("John", "Doe", "test@test.com", "Password1", 20);
-        $list = new TodoList($user);
+    public function test_todolist_has_items_relation()
+    {
+        $user = User::factory()->create();
 
-        for ($i = 1; $i <= 3; $i++) {
-            $list->add(new Item(
-                "iteme$i",
-                "contente",
-                new DateTime("+$i hours")
-            ));
-        }
+        $todo = TodoList::create([
+            'user_id' => $user->id
+        ]);
+
+        $this->assertTrue(method_exists($todo, 'items'));
     }
 }

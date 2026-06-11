@@ -4,18 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use DateTime;
 
 class Item extends Model
 {
-   public function __construct(
+    use HasFactory;
 
-        private string $name,
-        private string $content,
-        private DateTime $createdAt
-   ){
-     if (strlen($content) > 1000) {
-        throw new \InvalidArgumentException("Content must be less than 1000 characters.");
-     }
-   }
+    protected $fillable = [
+        'todo_list_id',
+        'name',
+        'content',
+        'created_at'
+    ];
+
+    public $timestamps = false;
+
+    public function todoList()
+    {
+        return $this->belongsTo(TodoList::class);
+    }
+
+   protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($item) {
+            if (strlen($item->content ?? '') > 1000) {
+                throw new \InvalidArgumentException("Content too long");
+            }
+        });
+    }
 }

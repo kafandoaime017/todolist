@@ -1,43 +1,43 @@
 <?php
-namespace App\Models;
-use Illuminate\Database\Eloquent\Model;
 
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-   public function __construct(
-        private string $firstName,
-        private string $lastName,
-        private string $email,
-        private string $password,
-        private int $age
-   ){}
+    use HasFactory;
 
-   public function isValid():bool
-   {
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+        'age',
+    ];
+
+    public function todoList()
+    {
+        return $this->hasOne(TodoList::class);
+    }
+
+    public function isValid(): bool
+    {
         return $this->isEmailValid()
-            && !empty($this->firstName)
-            && !empty($this->lastName)
+            && !empty($this->first_name)
+            && !empty($this->last_name)
             && $this->isPasswordValid()
-            && $this->isValidAge();
-   }
+            && $this->age >= 13;
+    }
 
-   private function isEmailValid():bool
-   {
+    private function isEmailValid(): bool
+    {
         return filter_var($this->email, FILTER_VALIDATE_EMAIL) !== false;
-   }
-
-    private function isPasswordValid():bool
-    {
-          return preg_match('/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,40}$/', $this->password);
     }
 
-    private function isValidAge():bool
+    private function isPasswordValid(): bool
     {
-        return $this->age >= 13;
+        return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,40}$/', $this->password);
     }
-   
-   
-
-   
 }
